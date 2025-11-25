@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net8.0</TargetFramework>
+				<ImplicitUsings>enable</ImplicitUsings>
+				<Nullable>enable</Nullable>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="Zamin.Core.ApplicationServices" Version="8.0.0-beta.1" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\Sampel.RestAPI.Core.Contracts\Sampel.RestAPI.Core.Contracts.csproj" />
+				<ProjectReference Include="..\Sampel.RestAPI.Core.Domain\Sampel.RestAPI.Core.Domain.csproj" />
+				<ProjectReference Include="..\Sampel.RestAPI.Core.RequestResponse\Sampel.RestAPI.Core.RequestResponse.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+		  <Folder Include="RestApiDemos\Commands\Update\" />
+		  <Folder Include="RestApiDemos\Commands\Delete\" />
+		  <Folder Include="RestApiDemos\Queries\" />
+		</ItemGroup>
+
+</Project>
