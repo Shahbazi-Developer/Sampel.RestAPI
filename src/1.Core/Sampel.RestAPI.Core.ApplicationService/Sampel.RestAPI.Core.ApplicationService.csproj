@@ -16,10 +16,4 @@
 				<ProjectReference Include="..\Sampel.RestAPI.Core.RequestResponse\Sampel.RestAPI.Core.RequestResponse.csproj" />
 		</ItemGroup>
 
-		<ItemGroup>
-		  <Folder Include="RestApiDemos\Commands\Update\" />
-		  <Folder Include="RestApiDemos\Commands\Delete\" />
-		  <Folder Include="RestApiDemos\Queries\" />
-		</ItemGroup>
-
 </Project>

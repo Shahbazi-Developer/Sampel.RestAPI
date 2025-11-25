@@ -8,7 +8,7 @@ namespace Sampel.RestAPI.Core.Contracts.RestApiDemos.Queries
 {
     public interface IRestApiDemoQueryRepasitory : IQueryRepository
     {
-        Task<RestApiDemoGetByIdQr?> ExecuteAsync(RestApiDemoGetByIdQuery query);
+        Task<RestApiDemoGetByIdQr> ExecuteAsync(RestApiDemoGetByIdQuery query);
         Task<List<RestApiDemoGetSelectListQr>> ExecuteAsync(RestApiDemoGetSelectListQuery query);
         Task<PagedData<RestApiDemoGetPageFilterQr>> ExecuteAsync(RestApiDemoGetPageFilterQuery query);
     }
