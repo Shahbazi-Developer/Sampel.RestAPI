@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sampel.RestAPI.Core.RequestResponse.RestApiDemos.Commands.Create;
 using Sampel.RestAPI.Core.RequestResponse.RestApiDemos.Commands.Delete;
@@ -12,6 +13,7 @@ using Zamin.Extensions.UsersManagement.Abstractions;
 
 namespace Sampel.RestAPI.Endpoints.API.RestApiDemos
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RestApiDemoController : BaseController
