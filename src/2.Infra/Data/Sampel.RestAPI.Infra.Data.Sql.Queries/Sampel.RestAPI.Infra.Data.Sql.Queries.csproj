@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\1.Core\Sampel.RestAPI.Core.Contracts\Sampel.RestAPI.Core.Contracts.csproj" />
     <ProjectReference Include="..\..\..\1.Core\Sampel.RestAPI.Core.RequestResponse\Sampel.RestAPI.Core.RequestResponse.csproj" />
+    <ProjectReference Include="..\Sampel.RestAPI.Infra.Data.Sql.Commands\Sampel.RestAPI.Infra.Data.Sql.Commands.csproj" />
   </ItemGroup>
 
 </Project>

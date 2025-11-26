@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
+using Sampel.RestAPI.Infra.Data.Sql.Commands.Common.ParrotTranslatorinitializers;
+using Sampel.RestAPI.Infra.Data.Sql.Queries.Common;
 using Serilog;
 using Zamin.EndPoints.Web.Extensions.ModelBinding;
 using Zamin.Extensions.DependencyInjection;
 using Zamin.Infra.Data.Sql.Commands.Interceptors;
-using Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
-using Sampel.RestAPI.Infra.Data.Sql.Queries.Common;
 
 namespace Sampel.RestAPI.Endpoints.API.Extentions;
 
@@ -22,10 +23,23 @@ public static class HostingExtensions
         builder.Services.AddEndpointsApiExplorer();
 
         //zamin
+
+        var parrotTranslatorSection = configuration.GetSection("ParrotTranslator");
+
+        builder.Services.AddZaminParrotTranslator(option =>
+        {
+            option.ConnectionString = parrotTranslatorSection.GetValue<string>("ConnectionString")!;
+            option.SchemaName = parrotTranslatorSection.GetValue<string>("SchemaName")!;
+            option.TableName = parrotTranslatorSection.GetValue<string>("TableName")!;
+        });
         builder.Services.AddZaminWebUserInfoService(configuration, "WebUserInfo", true);
 
-        //zamin
-        builder.Services.AddZaminParrotTranslator(configuration, "ParrotTranslator");
+        var parrot = new ParrotTranslatorInitializer(builder.Configuration);
+        parrot.Initialize(
+            parrotTranslatorSection.GetValue<string>("ConnectionString")!,
+            parrotTranslatorSection.GetValue<string>("SchemaName")!,
+            parrotTranslatorSection.GetValue<string>("TableName")!
+        );
 
         //zamin
         //builder.Services.AddSoftwarePartDetector(configuration, "SoftwarePart");
@@ -44,11 +58,11 @@ public static class HostingExtensions
         //builder.Services.AddZaminSqlDistributedCache(configuration, "SqlDistributedCache");
 
         //CommandDbContext
-        builder.Services.AddDbContext<Sampel.RestAPICommandDbContext>(c => c.UseSqlServer(configuration.GetConnectionString("CommandDb_ConnectionString"))
+        builder.Services.AddDbContext<RestAPICommandDbContext>(c => c.UseSqlServer(configuration.GetConnectionString("CommandDb_ConnectionString"))
             .AddInterceptors(new SetPersianYeKeInterceptor(), new AddAuditDataInterceptor()));
 
         //QueryDbContext
-        builder.Services.AddDbContext<Sampel.RestAPIQueryDbContext>(c => c.UseSqlServer(configuration.GetConnectionString("QueryDb_ConnectionString")));
+        builder.Services.AddDbContext<RestAPIQueryDbContext>(c => c.UseSqlServer(configuration.GetConnectionString("QueryDb_ConnectionString")));
 
         //PollingPublisher
         builder.Services.AddZaminPollingPublisherDalSql(configuration, "PollingPublisherSqlStore");

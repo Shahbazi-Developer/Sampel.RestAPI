@@ -12,7 +12,7 @@ namespace Sampel.RestAPI.Core.Domain.RestApiDemos.Entities
         public string? FirstName { get; private set; }
         public NationalId? NationalId { get; private set; }
         public string? PhoneNumber { get; private set; }
-        public Deleted Deleted { get; private set; }
+        public Deleted Deleted { get; private set; } = new(false);
 
         private RestApiDemo()
         { }

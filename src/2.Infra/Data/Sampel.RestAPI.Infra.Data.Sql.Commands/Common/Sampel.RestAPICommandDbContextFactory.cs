@@ -3,14 +3,14 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
 
-public class Sampel.RestAPICommandDbContextFactory : IDesignTimeDbContextFactory<Sampel.RestAPICommandDbContext>
+public class RestAPICommandDbContextFactory : IDesignTimeDbContextFactory<RestAPICommandDbContext>
 {
-    public Sampel.RestAPICommandDbContext CreateDbContext(string[] args)
+    public RestAPICommandDbContext CreateDbContext(string[] args)
     {
-        var builder = new DbContextOptionsBuilder<Sampel.RestAPICommandDbContext>();
+        var builder = new DbContextOptionsBuilder<RestAPICommandDbContext>();
 
-        builder.UseSqlServer("Server =.; Database=Sampel.RestAPIDb;User Id = ;Password = ; MultipleActiveResultSets = true; Encrypt = false");
+        builder.UseSqlServer("Server =.; Database=Sampel.RestAPIDb;User Id =sa ;Password =1qaz!QAZ ; MultipleActiveResultSets = true; Encrypt = false");
 
-        return new Sampel.RestAPICommandDbContext(builder.Options);
+        return new RestAPICommandDbContext(builder.Options);
     }
 }

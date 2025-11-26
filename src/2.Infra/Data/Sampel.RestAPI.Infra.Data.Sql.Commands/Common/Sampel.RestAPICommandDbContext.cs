@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Sampel.RestAPI.Core.Domain.RestApiDemos.Entities;
+using Sampel.RestAPI.Core.Domain.RestApiDemos.ValueObjects;
+using Sampel.RestAPI.Infra.Data.Sql.Commands.Common.ValueConverters;
 using System.Reflection;
 using Zamin.Extensions.Events.Outbox.Dal.EF;
 
 namespace Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
 
-public class Sampel.RestAPICommandDbContext : BaseOutboxCommandDbContext
+public class RestAPICommandDbContext : BaseOutboxCommandDbContext
 {
-    public Sampel.RestAPICommandDbContext(DbContextOptions<Sampel.RestAPICommandDbContext> options) : base(options)
+    public RestAPICommandDbContext(DbContextOptions<RestAPICommandDbContext> options) : base(options)
     {
     }
 
@@ -15,4 +18,15 @@ public class Sampel.RestAPICommandDbContext : BaseOutboxCommandDbContext
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(builder);
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+
+        configurationBuilder.Properties<Deleted>().HaveConversion<DeletedValueConverter>();
+        configurationBuilder.Properties<NationalId>().HaveConversion<NationalIdValueConvertor>();
+        base.ConfigureConventions(configurationBuilder);
+    }
+
+    public DbSet<RestApiDemo> RestApiDemos { get; set; }
+
 }

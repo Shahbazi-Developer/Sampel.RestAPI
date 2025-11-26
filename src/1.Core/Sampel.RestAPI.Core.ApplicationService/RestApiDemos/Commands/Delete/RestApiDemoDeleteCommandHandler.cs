@@ -33,10 +33,9 @@ namespace Sampel.RestAPI.Core.ApplicationService.RestApiDemos.Commands.Delete
 
                 throw new InvalidEntityStateException(_translator[TranslatorKeys.VALIDATION_ERROR_NOT_EXIST, nameof(command.Id)]);
             }
-
-            _restApiDemoCommandRepasitory.Delete(entity);
-
+            entity.Delete();
             await _restApiDemoCommandRepasitory.CommitAsync();
+
 
             return Ok();
         }
