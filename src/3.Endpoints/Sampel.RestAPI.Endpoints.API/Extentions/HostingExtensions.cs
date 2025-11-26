@@ -34,8 +34,7 @@ public static class HostingExtensions
         });
         builder.Services.AddZaminWebUserInfoService(configuration, "WebUserInfo", true);
 
-        var parrot = new ParrotTranslatorInitializer(builder.Configuration);
-        parrot.Initialize(
+        ParrotTranslatorInitializer.Initialize(
             parrotTranslatorSection.GetValue<string>("ConnectionString")!,
             parrotTranslatorSection.GetValue<string>("SchemaName")!,
             parrotTranslatorSection.GetValue<string>("TableName")!

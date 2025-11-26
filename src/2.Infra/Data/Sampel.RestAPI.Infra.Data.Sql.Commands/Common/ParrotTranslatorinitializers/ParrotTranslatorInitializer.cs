@@ -7,14 +7,7 @@ using System.Text;
 namespace Sampel.RestAPI.Infra.Data.Sql.Commands.Common.ParrotTranslatorinitializers;
 public class ParrotTranslatorInitializer
 {
-    private readonly IConfiguration _configuration;
-
-    public ParrotTranslatorInitializer(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
-    public void Initialize(string connectionString, string schemaName, string tableName)
+    public static void Initialize(string connectionString, string schemaName, string tableName)
     {
         var translatorKeyFieldInfo = typeof(TranslatorKeys).GetFields();
         var translatorValueFieldInfo = typeof(TranslatorValues).GetFields();
@@ -52,7 +45,7 @@ public class ParrotTranslatorInitializer
 
         queryBuilder.AppendLine("COMMIT TRANSACTION");
         queryBuilder.AppendLine("END");
-        using var connection = new SqlConnection(_configuration.GetConnectionString("CommandDb_ConnectionString"));
+        using var connection = new SqlConnection(connectionString);
             connection.Execute(queryBuilder.ToString(), new
         {
             schemaName,
