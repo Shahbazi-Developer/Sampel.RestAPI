@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
 
@@ -11,9 +12,11 @@ using Sampel.RestAPI.Infra.Data.Sql.Commands.Common;
 namespace Sampel.RestAPI.Infra.Data.Sql.Commands.Migrations
 {
     [DbContext(typeof(RestAPICommandDbContext))]
-    partial class RestAPICommandDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251129063137_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

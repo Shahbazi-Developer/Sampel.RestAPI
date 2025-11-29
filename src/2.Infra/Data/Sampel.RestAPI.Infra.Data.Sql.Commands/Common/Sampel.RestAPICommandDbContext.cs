@@ -26,7 +26,7 @@ public class RestAPICommandDbContext : BaseOutboxCommandDbContext
         configurationBuilder.Properties<NationalId>().HaveConversion<NationalIdValueConvertor>();
         base.ConfigureConventions(configurationBuilder);
     }
-
+    public DbSet<User> Users { get; set; }
     public DbSet<RestApiDemo> RestApiDemos { get; set; }
 
 }

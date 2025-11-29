@@ -3,14 +3,19 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sampel.RestAPI.Endpoints.API.Authentication;
 using Sampel.RestAPI.Endpoints.API.Extentions;
+using Sampel.RestAPI.Infra.Data.Sql.Commands.Users;
 using System.Text;
 using Zamin.Extensions.DependencyInjection;
 using Zamin.Utilities.SerilogRegistration.Extensions;
+using Sampel.RestAPI.Core.Contracts.RestApiDemos.Users;
 
 SerilogExtensions.RunWithSerilogExceptionHandling(() =>
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    // =====================================================
+    // 1) JWT CONFIGURATION
+    // =====================================================
     builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
     builder.Services.AddScoped<JwtTokenGenerator>();
 
@@ -35,6 +40,14 @@ SerilogExtensions.RunWithSerilogExceptionHandling(() =>
 
     builder.Services.AddAuthorization();
 
+    // =====================================================
+    // 2) USER REPOSITORY
+    // =====================================================
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+    // =====================================================
+    // 3) SWAGGER WITH JWT AUTH
+    // =====================================================
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo
@@ -69,6 +82,9 @@ SerilogExtensions.RunWithSerilogExceptionHandling(() =>
         });
     });
 
+    // =====================================================
+    // 4) ZAMIN + SERILOG + PIPELINE
+    // =====================================================
     var app = builder
         .AddZaminSerilog(o =>
         {
@@ -80,11 +96,21 @@ SerilogExtensions.RunWithSerilogExceptionHandling(() =>
         .ConfigureServices()
         .ConfigurePipeline();
 
+    // =====================================================
+    // 5) SWAGGER UI
+    // =====================================================
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    app.UseAuthentication();  
+    // =====================================================
+    // 6) AUTHENTICATION + AUTHORIZATION
+    //    (حتماً بعد از ConfigurePipeline)
+    // =====================================================
+    app.UseAuthentication();
     app.UseAuthorization();
 
+    // =====================================================
+    // 7) RUN
+    // =====================================================
     app.Run();
 });

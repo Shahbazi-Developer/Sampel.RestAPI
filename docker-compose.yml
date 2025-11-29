@@ -1,0 +1,6 @@
+services:
+  sampel.restapi.endpoints.api:
+    image: ${DOCKER_REGISTRY-}sampelrestapiendpointsapi
+    build:
+      context: .
+      dockerfile: src/3.Endpoints/Sampel.RestAPI.Endpoints.API/Dockerfile
