@@ -35,7 +35,7 @@ namespace Sampel.RestAPI.Endpoints.API.RestApiDemos
         }
 
         [HttpPost("Delete")]
-        public async Task<IActionResult> DeleteLabEquipment([FromQuery] RestApiDemoDeleteCommand command)
+        public async Task<IActionResult> DeleteRestApiDemo([FromQuery] RestApiDemoDeleteCommand command)
         {
             return await Delete(command);
         }
