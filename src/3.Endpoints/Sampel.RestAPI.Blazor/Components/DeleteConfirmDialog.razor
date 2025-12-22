@@ -1,0 +1,183 @@
+@using MudBlazor
+@using Sampel.RestAPI.Blazor.Models
+@using Sampel.RestAPI.Blazor.Services
+@inject IRestApiDemoService RestApiDemoService
+@inject ISnackbar Snackbar
+
+<MudDialog Class="delete-dialog">
+    <TitleContent>
+        <div class="delete-dialog-header">
+            <div class="delete-icon-wrapper">
+                <MudIcon Icon="@Icons.Material.Filled.DeleteForever" 
+                        Size="Size.Large" 
+                        Class="delete-header-icon" />
+            </div>
+            <div class="delete-title-wrapper">
+                <MudText Typo="Typo.h5" Class="delete-title-text">
+                    تأیید حذف
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="delete-subtitle-text">
+                    این عمل قابل بازگشت نیست
+                </MudText>
+            </div>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div class="delete-dialog-content">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" 
+                         Class="mb-4 delete-error-alert" 
+                         Dismissible="true" 
+                         OnCloseButtonClick="ClearError"
+                         Variant="Variant.Filled">
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Class="ms-2" />
+                        <MudText>@_errorMessage</MudText>
+                    </div>
+                </MudAlert>
+            }
+
+            <div class="delete-warning-box">
+                <div class="delete-warning-icon">
+                    <MudIcon Icon="@Icons.Material.Filled.Warning" Size="Size.Large" />
+                </div>
+                <MudText Typo="Typo.h6" Class="delete-warning-title">
+                    آیا از حذف این اطلاعات اطمینان دارید؟
+                </MudText>
+                <MudText Typo="Typo.body2" Class="delete-warning-message">
+                    این عمل غیرقابل بازگشت است و تمام اطلاعات مربوط به این رکورد به طور دائم حذف خواهد شد.
+                </MudText>
+            </div>
+
+            <div class="delete-item-info">
+                <MudText Typo="Typo.subtitle2" Class="delete-item-section-title">
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Class="ms-2" />
+                    اطلاعات رکورد
+                </MudText>
+                <div class="delete-item-details">
+                    <div class="delete-item-row">
+                        <div class="delete-item-icon-wrapper">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        </div>
+                        <div class="delete-item-content">
+                            <MudText Typo="Typo.caption" Class="delete-item-label">نام و نام خانوادگی</MudText>
+                            <MudText Typo="Typo.body1" Class="delete-item-value">
+                                @(Item?.FirstName ?? "") @(Item?.LastName ?? "")
+                            </MudText>
+                        </div>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Item?.NationalId))
+                    {
+                        <div class="delete-item-row">
+                            <div class="delete-item-icon-wrapper">
+                                <MudIcon Icon="@Icons.Material.Filled.Badge" />
+                            </div>
+                            <div class="delete-item-content">
+                                <MudText Typo="Typo.caption" Class="delete-item-label">کد ملی</MudText>
+                                <MudText Typo="Typo.body1" Class="delete-item-value">@Item.NationalId</MudText>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Item?.PhoneNumber))
+                    {
+                        <div class="delete-item-row">
+                            <div class="delete-item-icon-wrapper">
+                                <MudIcon Icon="@Icons.Material.Filled.Phone" />
+                            </div>
+                            <div class="delete-item-content">
+                                <MudText Typo="Typo.caption" Class="delete-item-label">شماره تماس</MudText>
+                                <MudText Typo="Typo.body1" Class="delete-item-value">@Item.PhoneNumber</MudText>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <div class="delete-dialog-actions">
+            <MudButton Variant="Variant.Outlined" 
+                     Color="Color.Default" 
+                     OnClick="Cancel"
+                     Disabled="@_deleting"
+                     Size="Size.Large"
+                     Class="delete-cancel-button">
+                <MudIcon Icon="@Icons.Material.Filled.Close" Class="ms-2" />
+                انصراف
+            </MudButton>
+            <MudButton Color="Color.Error" 
+                     Variant="Variant.Filled" 
+                     OnClick="Delete"
+                     Disabled="@_deleting"
+                     Size="Size.Large"
+                     StartIcon="@Icons.Material.Filled.Delete"
+                     Class="delete-confirm-button">
+                @if (_deleting)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" Color="Color.Inherit" />
+                    <MudText Class="ms-2">در حال حذف...</MudText>
+                }
+                else
+                {
+                    <MudText>حذف رکورد</MudText>
+                }
+            </MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public RestApiDemoItem? Item { get; set; }
+
+    private bool _deleting = false;
+    private string _errorMessage = string.Empty;
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void ClearError()
+    {
+        _errorMessage = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task Delete()
+    {
+        if (_deleting || Item?.Id == null)
+            return;
+
+        _errorMessage = string.Empty;
+        _deleting = true;
+        StateHasChanged();
+
+        try
+        {
+            var success = await RestApiDemoService.DeleteAsync(Item.Id.Value);
+
+            if (success)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                _errorMessage = "خطا در حذف اطلاعات. لطفاً دوباره تلاش کنید.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"خطا در حذف اطلاعات: {ex.Message}";
+        }
+        finally
+        {
+            _deleting = false;
+            StateHasChanged();
+        }
+    }
+}
+

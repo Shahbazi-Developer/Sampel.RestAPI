@@ -1,0 +1,329 @@
+@page "/register"
+@layout AuthLayout
+@using Sampel.RestAPI.Blazor.Models
+@using Sampel.RestAPI.Blazor.Services
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>ثبت نام</PageTitle>
+<link href="css/register.css" rel="stylesheet" />
+
+<div class="container-fluid auth-container">
+    <div class="row align-items-center justify-content-center g-0" style="min-height: 100vh; width: 100%;">
+        <!-- Left Side - Hero Section -->
+        <div class="col-12 col-md-6 d-none d-md-flex hero-side">
+            <div class="d-flex flex-column align-items-center justify-content-center hero-content px-4 py-5">
+                <div class="floating-icon mb-4">
+                    <i class="material-icons" style="font-size: 140px; color: rgba(255,255,255,0.95);">person_add</i>
+                </div>
+                <div class="text-center mb-4">
+                    <h3 class="text-white fw-bold mb-3" style="text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                        به جمع ما بپیوندید
+                    </h3>
+                    <h6 class="text-white" style="color: rgba(255,255,255,0.9); max-width: 400px;">
+                        با ثبت نام در سیستم از تمام امکانات و ویژگی‌های پیشرفته بهره‌مند شوید
+                    </h6>
+                </div>
+                
+                <div class="w-100 mt-4" style="max-width: 350px;">
+                    <div class="feature-card p-3 mb-3 rounded-3" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2);">
+                                <i class="material-icons text-white">check_circle</i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-semibold">ثبت نام رایگان</div>
+                                <small class="text-white" style="color: rgba(255,255,255,0.8);">بدون هیچ هزینه‌ای</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card p-3 mb-3 rounded-3" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2);">
+                                <i class="material-icons text-white">speed</i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-semibold">دسترسی سریع</div>
+                                <small class="text-white" style="color: rgba(255,255,255,0.8);">شروع فوری</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card p-3 rounded-3" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background: rgba(255,255,255,0.2);">
+                                <i class="material-icons text-white">support</i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-semibold">پشتیبانی 24/7</div>
+                                <small class="text-white" style="color: rgba(255,255,255,0.8);">همیشه در دسترس</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side - Register Form -->
+        <div class="col-12 col-md-6 form-side">
+            <div class="auth-paper p-5 rounded-4">
+                <div class="paper-glow"></div>
+                
+                <div class="d-flex flex-column align-items-center mb-5">
+                    <div class="avatar-container mb-3">
+                        <div class="main-avatar rounded-circle d-flex align-items-center justify-content-center" 
+                             style="width: 100px; height: 100px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);">
+                            <i class="material-icons text-white" style="font-size: 50px;">person_add</i>
+                        </div>
+                        <div class="avatar-ring"></div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="fw-bold mb-2" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            ایجاد حساب کاربری
+                        </h4>
+                        <p class="text-muted mb-0">فرم زیر را تکمیل کنید تا شروع کنید</p>
+                    </div>
+                </div>
+
+                <EditForm Model="@_registerModel" OnValidSubmit="HandleRegister">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="input-wrapper mb-4">
+                        <MudTextField @bind-Value="_registerModel.FullName" 
+                                     Label="نام و نام خانوادگی" 
+                                     Variant="Variant.Outlined" 
+                                     FullWidth="true"
+                                     Required="true"
+                                     RequiredError="نام و نام خانوادگی الزامی است"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Person"
+                                     Class="custom-input"
+                                     Style="font-size: 16px;" />
+                    </div>
+
+                    <div class="input-wrapper mb-4">
+                        <MudTextField @bind-Value="_registerModel.Username" 
+                                     Label="نام کاربری" 
+                                     Variant="Variant.Outlined" 
+                                     FullWidth="true"
+                                     Required="true"
+                                     RequiredError="نام کاربری الزامی است"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.AccountCircle"
+                                     Class="custom-input"
+                                     Style="font-size: 16px;" />
+                    </div>
+
+                    <div class="input-wrapper mb-4">
+                        <MudTextField @bind-Value="_registerModel.Password" 
+                                     Label="رمز عبور" 
+                                     Variant="Variant.Outlined" 
+                                     InputType="@_passwordInputType" 
+                                     FullWidth="true"
+                                     Required="true"
+                                     RequiredError="رمز عبور الزامی است"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Lock"
+                                     Class="custom-input"
+                                     Style="font-size: 16px;">
+                            <AdornmentEnd>
+                                <MudIconButton Icon="@(_showPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                              OnClick="TogglePasswordVisibility"
+                                              Color="Color.Default"
+                                              Style="transition: all 0.3s ease;" />
+                            </AdornmentEnd>
+                        </MudTextField>
+                    </div>
+
+                    <div class="input-wrapper mb-4">
+                        <MudTextField @bind-Value="_confirmPassword" 
+                                     Label="تکرار رمز عبور" 
+                                     Variant="Variant.Outlined" 
+                                     InputType="@_confirmPasswordInputType" 
+                                     FullWidth="true"
+                                     Required="true"
+                                     RequiredError="تکرار رمز عبور الزامی است"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Lock"
+                                     Class="custom-input"
+                                     Style="font-size: 16px;">
+                            <AdornmentEnd>
+                                <MudIconButton Icon="@(_showConfirmPassword ? Icons.Material.Filled.Visibility : Icons.Material.Filled.VisibilityOff)"
+                                              OnClick="ToggleConfirmPasswordVisibility"
+                                              Color="Color.Default"
+                                              Style="transition: all 0.3s ease;" />
+                            </AdornmentEnd>
+                        </MudTextField>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_passwordMismatchError))
+                    {
+                        <MudAlert Severity="Severity.Error" 
+                                 Class="mb-4 error-shake" 
+                                 Variant="Variant.Filled"
+                                 Style="border-radius: 12px;">
+                            <MudIcon Icon="@Icons.Material.Filled.Error" Class="ms-2" />
+                            @_passwordMismatchError
+                        </MudAlert>
+                    }
+
+                    @if (!string.IsNullOrEmpty(_registerModel.Password))
+                    {
+                        <div class="password-strength-card p-3 mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted fw-semibold">قدرت رمز عبور:</small>
+                                <small class="fw-semibold" style="color: @GetPasswordStrengthColorHex();">
+                                    @GetPasswordStrengthText()
+                                </small>
+                            </div>
+                            <MudProgressLinear Color="@GetPasswordStrengthColor()" 
+                                              Value="@GetPasswordStrength()" 
+                                              Variant="Variant.Flat"
+                                              Style="height: 8px; border-radius: 4px;" />
+                        </div>
+                    }
+
+                    <MudButton ButtonType="ButtonType.Submit" 
+                              Variant="Variant.Filled" 
+                              Color="Color.Primary" 
+                              FullWidth="true"
+                              Size="Size.Large"
+                              Disabled="@_isLoading"
+                              Class="mt-4 mb-4 submit-button">
+                        @if (_isLoading)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" Color="Color.Inherit" />
+                            <MudText Class="ms-2">در حال ثبت نام...</MudText>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="ms-2" />
+                            <MudText>ایجاد حساب کاربری</MudText>
+                        }
+                    </MudButton>
+                </EditForm>
+
+                <hr class="my-4" />
+                <div class="text-center mb-3">
+                    <span class="text-muted small fw-medium">یا</span>
+                </div>
+
+                <div class="d-flex flex-column align-items-center">
+                    <p class="text-muted mb-3">قبلاً ثبت نام کرده‌اید؟</p>
+                    <MudButton Variant="Variant.Outlined" 
+                              Color="Color.Primary" 
+                              FullWidth="true"
+                              Href="/login"
+                              StartIcon="@Icons.Material.Filled.Login"
+                              Class="login-button">
+                        ورود به سیستم
+                    </MudButton>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterRequest _registerModel = new();
+    private string _confirmPassword = string.Empty;
+    private bool _isLoading = false;
+    private string _passwordMismatchError = string.Empty;
+    private bool _showPassword = false;
+    private bool _showConfirmPassword = false;
+    private InputType _passwordInputType = InputType.Password;
+    private InputType _confirmPasswordInputType = InputType.Password;
+
+    private void TogglePasswordVisibility()
+    {
+        _showPassword = !_showPassword;
+        _passwordInputType = _showPassword ? InputType.Text : InputType.Password;
+    }
+
+    private void ToggleConfirmPasswordVisibility()
+    {
+        _showConfirmPassword = !_showConfirmPassword;
+        _confirmPasswordInputType = _showConfirmPassword ? InputType.Text : InputType.Password;
+    }
+
+    private int GetPasswordStrength()
+    {
+        if (string.IsNullOrEmpty(_registerModel.Password))
+            return 0;
+
+        int strength = 0;
+        if (_registerModel.Password.Length >= 6) strength += 25;
+        if (_registerModel.Password.Length >= 8) strength += 25;
+        if (_registerModel.Password.Any(char.IsDigit)) strength += 25;
+        if (_registerModel.Password.Any(char.IsUpper) || _registerModel.Password.Any(char.IsLower)) strength += 25;
+
+        return strength;
+    }
+
+    private Color GetPasswordStrengthColor()
+    {
+        var strength = GetPasswordStrength();
+        if (strength < 50) return Color.Error;
+        if (strength < 75) return Color.Warning;
+        return Color.Success;
+    }
+
+    private string GetPasswordStrengthColorHex()
+    {
+        var strength = GetPasswordStrength();
+        if (strength < 50) return "#f44336";
+        if (strength < 75) return "#ff9800";
+        return "#4caf50";
+    }
+
+    private string GetPasswordStrengthText()
+    {
+        var strength = GetPasswordStrength();
+        if (strength < 50) return "ضعیف";
+        if (strength < 75) return "متوسط";
+        return "قوی";
+    }
+
+    private async Task HandleRegister()
+    {
+        _passwordMismatchError = string.Empty;
+
+        if (_registerModel.Password != _confirmPassword)
+        {
+            _passwordMismatchError = "رمز عبور و تکرار آن مطابقت ندارند";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_registerModel.Password) || _registerModel.Password.Length < 6)
+        {
+            _passwordMismatchError = "رمز عبور باید حداقل 6 کاراکتر باشد";
+            return;
+        }
+
+        _isLoading = true;
+        try
+        {
+            var result = await AuthService.RegisterAsync(_registerModel);
+            
+            if (result)
+            {
+                Snackbar.Add("ثبت نام با موفقیت انجام شد. لطفاً وارد شوید", Severity.Success);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                Snackbar.Add("خطا در ثبت نام. ممکن است نام کاربری تکراری باشد", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"خطا در ثبت نام: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

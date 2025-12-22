@@ -13,7 +13,7 @@ using Zamin.Extensions.UsersManagement.Abstractions;
 
 namespace Sampel.RestAPI.Endpoints.API.RestApiDemos
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class RestApiDemoController : BaseController
