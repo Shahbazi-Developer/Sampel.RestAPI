@@ -1,0 +1,345 @@
+@using MudBlazor
+@using Sampel.RestAPI.Blazor.Models
+@using Sampel.RestAPI.Blazor.Services
+@inject IRestApiDemoService RestApiDemoService
+@inject ISnackbar Snackbar
+
+<MudDialog Class="professional-dialog">
+    <TitleContent>
+        <div class="dialog-header-enhanced">
+            <div class="dialog-icon-wrapper">
+                <MudIcon Icon="@(IsEdit ? Icons.Material.Filled.Edit : Icons.Material.Filled.PersonAdd)" 
+                        Size="Size.Large" 
+                        Class="dialog-header-icon" />
+            </div>
+            <div class="dialog-title-wrapper">
+                <MudText Typo="Typo.h5" Class="dialog-title-text">
+                    @(IsEdit ? "ویرایش اطلاعات" : "افزودن اطلاعات جدید")
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="dialog-subtitle-text">
+                    @(IsEdit ? "اطلاعات را ویرایش کنید" : "لطفاً اطلاعات را وارد کنید")
+                </MudText>
+            </div>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <div class="dialog-content-enhanced">
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" 
+                         Class="mb-4 error-alert-enhanced" 
+                         Dismissible="true" 
+                         OnCloseButtonClick="ClearError"
+                         Variant="Variant.Filled">
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Class="ms-2" />
+                        <MudText>@_errorMessage</MudText>
+                    </div>
+                </MudAlert>
+            }
+
+            <MudForm @ref="_form" @bind-IsValid="@_isValid" @bind-Errors="@_errors" Class="professional-form">
+            <div class="form-section">
+                <MudText Typo="Typo.subtitle1" Class="form-section-title">
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Size="Size.Small" Class="ms-2" />
+                    اطلاعات شخصی
+                </MudText>
+                <MudGrid Spacing="3" Class="mt-2">
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.FirstName" 
+                                     Label="نام" 
+                                     Required="true"
+                                     RequiredError="نام الزامی است"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Person"
+                                     Class="form-field-enhanced"
+                                     MaxLength="50"
+                                     HelperText="نام خود را وارد کنید"
+                                     InputType="InputType.Text"
+                                     Immediate="true" />
+                    </MudItem>
+                    
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.LastName" 
+                                     Label="نام خانوادگی" 
+                                     Required="true"
+                                     RequiredError="نام خانوادگی الزامی است"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Person"
+                                     Class="form-field-enhanced"
+                                     MaxLength="50"
+                                     HelperText="نام خانوادگی خود را وارد کنید"
+                                     InputType="InputType.Text"
+                                     Immediate="true" />
+                    </MudItem>
+                    
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_model.NationalId" 
+                                     Label="کد ملی" 
+                                     Required="true"
+                                     RequiredError="کد ملی الزامی است"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Badge"
+                                     Class="form-field-enhanced"
+                                     MaxLength="10"
+                                     HelperText="کد ملی باید 10 رقم باشد"
+                                     InputType="InputType.Number"
+                                     Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </div>
+
+            <div class="form-section mt-6">
+                <MudText Typo="Typo.subtitle1" Class="form-section-title">
+                    <MudIcon Icon="@Icons.Material.Filled.ContactPhone" Size="Size.Small" Class="ms-2" />
+                    اطلاعات تماس
+                </MudText>
+                <MudGrid Spacing="3" Class="mt-2">
+                    <MudItem xs="12" sm="12">
+                        <MudTextField @bind-Value="_model.PhoneNumber" 
+                                     Label="شماره تماس" 
+                                     Required="true"
+                                     RequiredError="شماره تماس الزامی است"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Filled.Phone"
+                                     Class="form-field-enhanced"
+                                     MaxLength="11"
+                                     HelperText="شماره تماس 11 رقمی وارد کنید"
+                                     InputType="InputType.Text"
+                                     Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </div>
+            </MudForm>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <div class="dialog-actions-enhanced">
+        <MudButton Variant="Variant.Outlined" 
+                   Color="Color.Default" 
+                   OnClick="Cancel"
+                   Disabled="@_saving"
+                   Size="Size.Large"
+                   Class="cancel-button-enhanced">
+            <MudIcon Icon="@Icons.Material.Filled.Close" Class="ms-2" />
+            انصراف
+        </MudButton>
+        <MudButton Color="Color.Primary" 
+                   Variant="Variant.Filled" 
+                   OnClick="Save"
+                   Disabled="@(!_isValid || _saving)"
+                   Size="Size.Large"
+                   StartIcon="@(IsEdit ? Icons.Material.Filled.Save : Icons.Material.Filled.Check)"
+                   Class="save-button-enhanced">
+            @if (_saving)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" Color="Color.Inherit" />
+                <MudText Class="ms-2">در حال ذخیره...</MudText>
+            }
+            else
+            {
+                <MudText>@(IsEdit ? "ذخیره تغییرات" : "افزودن اطلاعات")</MudText>
+            }
+        </MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public bool IsEdit { get; set; }
+    [Parameter] public RestApiDemoItem? Item { get; set; }
+
+    private MudForm? _form;
+    private bool _isValid = false;
+    private bool _saving = false;
+    private string[] _errors = Array.Empty<string>();
+    private string _errorMessage = string.Empty;
+
+    private RestApiDemoCreateRequest _model = new();
+
+    protected override void OnParametersSet()
+    {
+        if (IsEdit && Item != null)
+        {
+            _model.FirstName = Item.FirstName ?? string.Empty;
+            _model.LastName = Item.LastName ?? string.Empty;
+            _model.NationalId = Item.NationalId ?? string.Empty;
+            _model.PhoneNumber = Item.PhoneNumber ?? string.Empty;
+        }
+        else
+        {
+            _model = new RestApiDemoCreateRequest();
+        }
+        _errorMessage = string.Empty;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void ClearError()
+    {
+        _errorMessage = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task Save()
+    {
+        if (_saving)
+            return;
+
+        _errorMessage = string.Empty;
+        
+        // اعتبارسنجی فرم
+        await _form!.Validate();
+
+        if (!_isValid)
+        {
+            _errorMessage = "لطفاً تمام فیلدهای الزامی را پر کنید";
+            StateHasChanged();
+            return;
+        }
+
+        // اعتبارسنجی اضافی
+        var trimmedNationalId = _model.NationalId?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(trimmedNationalId))
+        {
+            _errorMessage = "کد ملی الزامی است";
+            StateHasChanged();
+            return;
+        }
+        
+        if (trimmedNationalId.Length != 10)
+        {
+            _errorMessage = "کد ملی باید دقیقاً 10 رقم باشد";
+            StateHasChanged();
+            return;
+        }
+        
+        // بررسی اینکه کد ملی فقط عدد باشد
+        if (!trimmedNationalId.All(char.IsDigit))
+        {
+            _errorMessage = "کد ملی باید فقط شامل اعداد باشد";
+            StateHasChanged();
+            return;
+        }
+
+        var trimmedPhoneNumber = _model.PhoneNumber?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(trimmedPhoneNumber))
+        {
+            _errorMessage = "شماره تماس الزامی است";
+            StateHasChanged();
+            return;
+        }
+        
+        if (trimmedPhoneNumber.Length < 10)
+        {
+            _errorMessage = "شماره تماس باید حداقل 10 رقم باشد";
+            StateHasChanged();
+            return;
+        }
+        
+        // بررسی اینکه شماره تماس فقط عدد باشد
+        if (!trimmedPhoneNumber.All(char.IsDigit))
+        {
+            _errorMessage = "شماره تماس باید فقط شامل اعداد باشد";
+            StateHasChanged();
+            return;
+        }
+        
+        // بررسی نام و نام خانوادگی
+        var trimmedFirstName = _model.FirstName?.Trim() ?? string.Empty;
+        var trimmedLastName = _model.LastName?.Trim() ?? string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(trimmedFirstName))
+        {
+            _errorMessage = "نام الزامی است";
+            StateHasChanged();
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(trimmedLastName))
+        {
+            _errorMessage = "نام خانوادگی الزامی است";
+            StateHasChanged();
+            return;
+        }
+
+        _saving = true;
+        StateHasChanged();
+
+        string actionMessage = IsEdit ? "ویرایش" : "افزودن";
+
+        try
+        {
+            bool success = false;
+
+            if (IsEdit && Item != null)
+            {
+                var updateRequest = new RestApiDemoUpdateRequest
+                {
+                    Id = Item.Id ?? 0,
+                    FirstName = trimmedFirstName,
+                    LastName = trimmedLastName,
+                    NationalId = trimmedNationalId,
+                    PhoneNumber = trimmedPhoneNumber
+                };
+                success = await RestApiDemoService.UpdateAsync(updateRequest);
+                if (!success)
+                {
+                    _errorMessage = $"خطا در {actionMessage} اطلاعات. لطفاً دوباره تلاش کنید.";
+                }
+            }
+            else
+            {
+                var createRequest = new RestApiDemoCreateRequest
+                {
+                    FirstName = trimmedFirstName,
+                    LastName = trimmedLastName,
+                    NationalId = trimmedNationalId,
+                    PhoneNumber = trimmedPhoneNumber
+                };
+                
+                try
+                {
+                    var result = await RestApiDemoService.CreateAsync(createRequest);
+                    success = result.HasValue && result.Value > 0;
+                    if (!success)
+                    {
+                        _errorMessage = $"خطا در {actionMessage} اطلاعات. لطفاً دوباره تلاش کنید.";
+                    }
+                }
+                catch (Exception createEx)
+                {
+                    _errorMessage = $"خطا در افزودن اطلاعات: {createEx.Message}";
+                    if (createEx.InnerException != null)
+                    {
+                        _errorMessage += $" ({createEx.InnerException.Message})";
+                    }
+                    success = false;
+                }
+            }
+
+            if (success)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"خطا در {actionMessage} اطلاعات: {ex.Message}";
+        }
+        finally
+        {
+            _saving = false;
+            StateHasChanged();
+        }
+    }
+}
+

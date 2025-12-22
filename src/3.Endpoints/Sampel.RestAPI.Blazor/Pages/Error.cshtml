@@ -1,0 +1,15 @@
+@page
+@{
+    Layout = "_Layout";
+}
+
+<h1 class="text-danger">خطا</h1>
+<h2 class="text-danger">خطایی در پردازش درخواست شما رخ داده است.</h2>
+
+@if (!string.IsNullOrEmpty(ViewData["RequestId"]?.ToString()))
+{
+    <p>
+        <strong>Request ID:</strong> <code>@ViewData["RequestId"]</code>
+    </p>
+}
+

@@ -18,6 +18,7 @@ namespace Sampel.RestAPI.Infra.Data.Sql.Queries.RestApiDemos.Entities
         public string? NationalId { get;  set; }
         public string? PhoneNumber { get;  set; }
         public bool Deleted { get;  set; }
+        public DateTime? CreatedDateTime { get; set; }
 
 
         public static explicit operator RestApiDemoGetByIdQr(RestApiDemo entity) => new()

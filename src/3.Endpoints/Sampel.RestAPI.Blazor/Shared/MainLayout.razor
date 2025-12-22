@@ -1,0 +1,119 @@
+@inherits LayoutComponentBase
+@using Sampel.RestAPI.Blazor.Authentication
+@using Sampel.RestAPI.Blazor.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+@inject ITokenStorageService TokenStorageService
+@inject IHttpContextAccessor HttpContextAccessor
+@inject TokenCacheService TokenCache
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText Typo="Typo.h6">پنل مدیریت</MudText>
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                    <MudMenuItem>
+                        <MudText>@context.User.Identity?.Name</MudText>
+                    </MudMenuItem>
+                    <MudDivider />
+                    <MudMenuItem OnClick="Logout">خروج</MudMenuItem>
+                </MudMenu>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Text" Color="Color.Inherit" Href="/login">ورود</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+    private const string HttpContextTokenKey = "__AuthToken__";
+    private bool _tokenLoaded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_tokenLoaded)
+        {
+            // انتقال token از localStorage به HttpContext برای استفاده در DelegatingHandler
+            await LoadTokenToHttpContext();
+            _tokenLoaded = true;
+        }
+    }
+
+    private async Task LoadTokenToHttpContext()
+    {
+        try
+        {
+            if (HttpContextAccessor?.HttpContext == null)
+                return;
+
+            // بررسی اینکه Session در دسترس است یا نه
+            try
+            {
+                var session = HttpContextAccessor.HttpContext.Session;
+                if (session != null && !session.IsAvailable)
+                {
+                    await session.LoadAsync();
+                }
+            }
+            catch
+            {
+                // اگر Session در دسترس نبود، ادامه می‌دهیم
+            }
+
+            var token = await TokenStorageService.GetTokenAsync();
+            if (!string.IsNullOrEmpty(token))
+            {
+                HttpContextAccessor.HttpContext.Items[HttpContextTokenKey] = token;
+                
+                // همچنین در TokenCache هم ذخیره می‌کنیم
+                var contextKey = TokenCache.GetContextKey(HttpContextAccessor.HttpContext);
+                TokenCache.SetToken(contextKey, token);
+                
+                #if DEBUG
+                System.Diagnostics.Debug.WriteLine($"Token در MainLayout بارگذاری شد. Key: {contextKey}");
+                #endif
+            }
+        }
+        catch (Exception ex)
+        {
+            #if DEBUG
+            System.Diagnostics.Debug.WriteLine($"خطا در LoadTokenToHttpContext: {ex.Message}, StackTrace: {ex.StackTrace}");
+            #endif
+            // Ignore errors - این یک عملیات غیرضروری است و نباید باعث crash شود
+        }
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        if (AuthenticationStateProvider is CustomAuthenticationStateProvider authProvider)
+        {
+            authProvider.NotifyUserLogout();
+        }
+        Navigation.NavigateTo("/login");
+    }
+}
+

@@ -1,0 +1,107 @@
+@page "/"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>خانه</PageTitle>
+<link href="css/index.css" rel="stylesheet" />
+
+<AuthorizeView>
+    <Authorized>
+        <div class="home-container">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="welcome-icon mb-4">
+                        <div class="icon-wrapper">
+                            <i class="material-icons">check_circle</i>
+                        </div>
+                    </div>
+                    <h1 class="hero-title mb-3">خوش آمدید!</h1>
+                    <p class="hero-subtitle mb-4">شما با موفقیت وارد سیستم شده‌اید</p>
+                    <div class="user-info-card">
+                        <div class="user-avatar">
+                            <i class="material-icons">person</i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-label">کاربر</div>
+                            <div class="user-name">@context.User.Identity?.Name</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-shapes">
+                    <div class="shape shape-1"></div>
+                    <div class="shape shape-2"></div>
+                    <div class="shape shape-3"></div>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="home-container">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="welcome-icon mb-4">
+                        <div class="icon-wrapper">
+                            <i class="material-icons">home</i>
+                        </div>
+                    </div>
+                    <h1 class="hero-title mb-3">به سیستم خوش آمدید</h1>
+                    <p class="hero-subtitle mb-5">لطفاً برای ادامه وارد شوید یا ثبت نام کنید</p>
+                    
+                    <div class="action-buttons">
+                        <MudButton Variant="Variant.Filled" 
+                                  Color="Color.Primary" 
+                                  Href="/login"
+                                  Size="Size.Large"
+                                  Class="action-btn login-btn">
+                            <MudIcon Icon="@Icons.Material.Filled.Login" Class="ms-2" />
+                            <MudText>ورود به سیستم</MudText>
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" 
+                                  Color="Color.Primary" 
+                                  Href="/register"
+                                  Size="Size.Large"
+                                  Class="action-btn register-btn">
+                            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="ms-2" />
+                            <MudText>ثبت نام</MudText>
+                        </MudButton>
+                    </div>
+                    
+                    <div class="features-section mt-5">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="material-icons">security</i>
+                            </div>
+                            <div class="feature-text">
+                                <div class="feature-title">امنیت بالا</div>
+                                <div class="feature-desc">حفاظت از اطلاعات شما</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="material-icons">speed</i>
+                            </div>
+                            <div class="feature-text">
+                                <div class="feature-title">عملکرد سریع</div>
+                                <div class="feature-desc">پاسخگویی بالا</div>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="material-icons">support</i>
+                            </div>
+                            <div class="feature-text">
+                                <div class="feature-title">پشتیبانی 24/7</div>
+                                <div class="feature-desc">همیشه در دسترس</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-shapes">
+                    <div class="shape shape-1"></div>
+                    <div class="shape shape-2"></div>
+                    <div class="shape shape-3"></div>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
